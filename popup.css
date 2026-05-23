@@ -1,0 +1,118 @@
+/* Configuración General del Popup */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    width: 320px; /* Tamaño ideal para la ventanita de la extensión */
+    box-sizing: border-box;
+}
+
+.container {
+    padding: 16px;
+}
+
+/* Cuadro Grande para el Captcha */
+.captcha-box {
+    width: 100%;
+    height: 100px;
+    background-color: #e9ecef;
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px; /* Reducido un poco para dar espacio a la sección de errores */
+    box-sizing: border-box;
+}
+
+.captcha-placeholder {
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 🚀 NUEVOS ESTILOS: Cuadro Grande para Errores (Simétrico al Captcha) */
+.error-box {
+    width: 100%;
+    height: 100px;
+    background-color: #f8f9fa; /* Un gris un poco más claro */
+    border: 1px solid #dee2e6; /* Línea sólida limpia */
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px; /* Por si el texto del error llega a ser largo, que no toque los bordes */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.error-placeholder {
+    color: #198754; /* Verde suave inicial indicando que todo está OK ("Sin errores") */
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Contenedor del Formulario */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Inputs y Selects Estilizados */
+input[type="text"], select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #212529;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+input[type="text"]:focus, select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+/* Botón de Enviar */
+.btn-submit {
+    margin-top: 4px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #0d6efd;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-submit:hover {
+    background-color: #0b5ed7;
+}
+
+.btn-submit:active {
+    background-color: #0a58ca;
+}

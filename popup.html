@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Extractor RUNT</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="captcha-box">
+            <span class="captcha-placeholder">Aquí va el captcha</span>
+        </div>
+
+        <div id="error-section" class="error-box">
+            <span class="error-placeholder">Sin errores</span>
+        </div>
+
+        <form id="runt-form" class="form-container">
+            <div class="form-group">
+                <label for="tipoDocumento">Tipo de Documento</label>
+                <select id="tipoDocumento" required>
+                    <option value="cedula_ciudadania">Cédula de Ciudadanía</option>
+                    <option value="nit">NIT</option>
+                    <option value="pasaporte">Pasaporte</option>
+                    <option value="cedula_extranjeria">Cédula de Extranjería</option>
+                    <option value="tarjeta_identidad">Tarjeta de Identidad</option>
+                    <option value="registro_civil">Registro Civil</option>
+                    <option value="carnet_diplomatico">Carnet Diplomático</option>
+                    <option value="nn">NN</option>
+                    <option value="ti2">TI2</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="numeroDocumento">Número de Documento</label>
+                <input type="text" id="numeroDocumento" placeholder="Ej: 10234567" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="placa">Placa del Vehículo</label>
+                <input type="text" id="placa" placeholder="Ej: ABC123" required autocomplete="off" style="text-transform: uppercase;">
+            </div>
+
+            <button type="submit" class="btn-submit">Consultar RUNT</button>
+        </form>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

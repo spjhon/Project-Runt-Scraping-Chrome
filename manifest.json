@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Extractor RUNT - CDA",
+  "version": "1.0",
+  "description": "Extrae información de vehículos del RUNT mediante placa y cédula",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads",
+    "notifications",
+    "storage",
+    "offscreen",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://*.runt.com.co/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.runt.com.co/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
