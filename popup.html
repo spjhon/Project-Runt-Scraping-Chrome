@@ -6,16 +6,27 @@
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+
     <div class="container">
+
+
+
         <div class="captcha-box">
             <span class="captcha-placeholder">Aquí va el captcha</span>
         </div>
+
+
 
         <div id="error-section" class="error-box">
             <span class="error-placeholder">Sin errores</span>
         </div>
 
+
+
         <form id="runt-form" class="form-container">
+
+
+
             <div class="form-group">
                 <label for="tipoDocumento">Tipo de Documento</label>
                 <select id="tipoDocumento" required>
@@ -26,25 +37,40 @@
                     <option value="tarjeta_identidad">Tarjeta de Identidad</option>
                     <option value="registro_civil">Registro Civil</option>
                     <option value="carnet_diplomatico">Carnet Diplomático</option>
-                    <option value="nn">NN</option>
-                    <option value="ti2">TI2</option>
+                    <option value="ppt">Permiso por Protección Temporal</option>
+                    
                 </select>
             </div>
 
+
+
             <div class="form-group">
                 <label for="numeroDocumento">Número de Documento</label>
-                <input type="text" id="numeroDocumento" placeholder="Ej: 10234567" required autocomplete="off">
+                <input value="1053782464" type="text" id="numeroDocumento" placeholder="Ej: 10234567" required autocomplete="off">
             </div>
+
+
 
             <div class="form-group">
                 <label for="placa">Placa del Vehículo</label>
-                <input type="text" id="placa" placeholder="Ej: ABC123" required autocomplete="off" style="text-transform: uppercase;">
+                <input value="QYY43H" id="placa" placeholder="Ej: ABC123" required autocomplete="off" style="text-transform: uppercase;">
             </div>
 
+
+
+            <div class="form-group">
+                <label for="captchaTexto">Escribe el CAPTCHA</label>
+                <input type="text" id="captchaTexto" placeholder="Ej: XyZ7" required autocomplete="off" style="font-weight: bold; letter-spacing: 2px;">
+            </div>
+
+
+
             <button type="submit" class="btn-submit">Consultar RUNT</button>
+
         </form>
+
     </div>
-    
+
     <script src="popup.js"></script>
 </body>
 </html>

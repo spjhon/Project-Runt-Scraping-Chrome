@@ -1,31 +1,32 @@
 {
   "manifest_version": 3,
-  "name": "Extractor RUNT - CDA",
+  "name": "Extractor RUNT CDA",
   "version": "1.0",
-  "description": "Extrae información de vehículos del RUNT mediante placa y cédula",
   "permissions": [
-    "activeTab",
-    "scripting",
-    "downloads",
-    "notifications",
-    "storage",
+    "sidePanel",
     "offscreen",
     "scripting",
-    "tabs"
+    "tabs",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
-    "https://*.runt.com.co/*"
+    "https://*.runt.gov.co/*"
   ],
-  "action": {
-    "default_popup": "popup.html"
-  },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.runt.com.co/*"],
-      "js": ["content.js"]
+      "matches": ["https://portalpublico.runt.gov.co/*"],
+      "js": ["content.js"],
+      "all_frames": true
     }
-  ]
+  ],
+  "action": {
+    "default_title": "Abrir Extractor RUNT"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  }
+  
 }
