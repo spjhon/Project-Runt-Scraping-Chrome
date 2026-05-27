@@ -7,10 +7,13 @@
     "offscreen",
     "scripting",
     "tabs",
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "storage",
+  "activeTab"
   ],
   "host_permissions": [
-    "https://*.runt.gov.co/*"
+    "https://*.runt.gov.co/*",
+    "http://192.168.1.5:8090/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -20,6 +23,14 @@
       "matches": ["https://portalpublico.runt.gov.co/*"],
       "js": ["content.js"],
       "all_frames": true
+    },
+    {
+      "matches": [
+        "http://192.168.1.5/et/index.php/oficina/vehiculo/Cvehiculo*",
+        "http://192.168.1.5:8090/et/index.php/oficina/vehiculo/Cvehiculo*"
+      ],
+      "js": ["content_tecmmas.js"],
+      "run_at": "document_idle"
     }
   ],
   "action": {

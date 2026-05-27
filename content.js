@@ -2,13 +2,24 @@
 // 📢 FUNCIONES AUXILIARES
 // ==========================================
 
-// Reportar estados directamente en el cuadro del popup
+// Esta es una funcion de ayuda para que desde este content.js se pueda enviar diferentes mensajes
+//el message lo envia a todo el mundo menos a los otros tabs, osea que background y popup si pero contenttecmmas no
 function notificarPopup(mensaje) {
     chrome.runtime.sendMessage({
         action: "notificacionEstado",
         texto: mensaje
     });
 }
+
+
+
+
+
+
+
+
+
+
 
 
 // ==========================================
@@ -28,7 +39,7 @@ function esperarCaptcha() {
             clearTimeout(timeoutId);  // 🎯 NUEVO: Cancelamos el temporizador de 15s porque ya ganamos
             
             chrome.runtime.sendMessage({
-                action: "resultadoRunt",
+                action: "procesarCatcha",
                 success: true,
                 data: img.src
             });
@@ -42,11 +53,22 @@ function esperarCaptcha() {
     }, 15000);
 }
 
+
+// ==========================================
+// 🕵️ SE ACTIVA LA BUSQUEDA DEL CAPTCHA HASTA QUE APAREZCA O PASEN 15 SEGUNDOS
+// ==========================================
 if (window.location.href.includes("runt.gov.co")) {
     esperarCaptcha();
 }
 
 
+
+
+
+
+// ==========================================
+// 🕵️ EXTRACTOR UNA VEZ SE TIENE ACCESO
+// ==========================================
 function extraerDatosResultado() {
     notificarPopup("🔍 Extrayendo datos del vehículo...");
 
@@ -158,6 +180,12 @@ function extraerDatosResultado() {
 
 
 
+
+
+
+
+
+
 // ==========================================
 // 📊 VIGILAR QUE APAREZCA PINTADO EL SOAT PARA PODER PROCEDER A EXTRAER EL RESTO DE DATOS
 // ==========================================
@@ -248,7 +276,7 @@ function vigilarCargaResultados() {
 
 
 // ==========================================
-// 📥 INYECTAR LOS DATOS Y REPORTAR ESTADOS
+// 📥 INYECTAR LOS DATOS Y REPORTAR ESTADOS (LISTENERS)
 // ==========================================
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "inyectarDatosRunt") {
@@ -355,13 +383,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     }
 
                 }, 300);
+
+
+
             } else {
                 notificarPopup("⚠️ Selector de tipo de documento no hallado.");
             }
 
         } catch (error) {
             chrome.runtime.sendMessage({
-                action: "resultadoRunt",
+                action: "procesarCatcha",
                 success: false,
                 error: `Fallo en la inyección: ${error.message}`
             });

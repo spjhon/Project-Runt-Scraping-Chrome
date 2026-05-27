@@ -1,21 +1,65 @@
-const puertoVida = chrome.runtime.connect({ name: "sidepanel" });
-
 const URL_RUNT = "https://portalpublico.runt.gov.co/#/consulta-vehiculo/consulta/consulta-ciudadana";
 
 
 
-
-
-
-async function probarScrapingOculto() {
+// ==========================================
+// 🕵️ FUNCION QUE CREA Y ACTIVA LA VENTANA DEL RUNT PARA EL PROCESO, AQUI SE ACTIVA EL PROCESO
+// ==========================================
+async function activarCodigo() {
   const placeholder = document.querySelector(".captcha-placeholder");
   const errorDiv = document.getElementById("error-section");
   const captchaBox = document.querySelector(".captcha-box");
 
   placeholder.textContent = "Reiniciando entorno...";
 
+
+
+// ==========================================
+  // 🕵️ EXTRAER PLACA DE TECMMAS PRIMERO
+  // ==========================================
+  try {
+    placeholder.textContent = "Leyendo placa de Tecmmas...";
+    //aqui se activa la espera por parte del manejador en background
+    const respuesta = await chrome.runtime.sendMessage({ action: "leerPlaca" });
+
+    if (respuesta && respuesta.success) {
+      console.log(`✅ Placa devuelta con éxito: ${respuesta.placa}`);
+      document.getElementById("placa").value = respuesta.placa;
+    } else {
+      console.log(`❌ Error leyendo la placa de tecmmas.`);
+      errorDiv.style.borderColor = "#dc3545";
+      errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error leyendo la placa de tecmmas.</span>`;
+      document.getElementById("placa").value = "No hay placa";
+      return
+    }
+  } catch (error) {
+    console.log(`❌ Error leyendo la placa de tecmmas, Error desconocido`);
+    errorDiv.style.borderColor = "#dc3545";
+    errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error leyendo la placa de tecmmas, error desconocido: ${error.message}</span>`;
+    document.getElementById("placa").value = "No hay placa";
+    return
+  }
+
+
+
+
+
+
+  // ==========================================
+  // 🕵️ LISTENER DE MENJASES (Siempre activo)
+  // ==========================================
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "resultadoRunt") {
+
+
+    //Este es para notificaciones que llegan mientras llega el mensaje final
+    if (message.action === "notificacionEstado") {
+      errorDiv.style.borderColor = "#0d6efd";
+      errorDiv.innerHTML = `<span style="color: #0d6efd; font-weight: 500;">⚡ ${message.texto}</span>`;
+    }
+
+
+    //Una vez se recibe el captcha, se imprime en pantalla
+    if (message.action === "procesarCatcha") {
       if (message.success) {
         placeholder.textContent = "✅ ¡CAPTCHA CLONADO!";
         captchaBox.innerHTML = `<img src="${message.data}" alt="CAPTCHA RUNT" style="max-width:100%; height:auto; border-radius:6px; display:block; margin:0 auto;">`;
@@ -28,15 +72,17 @@ async function probarScrapingOculto() {
       }
     }
 
-    if (message.action === "notificacionEstado") {
-      errorDiv.style.borderColor = "#0d6efd";
-      errorDiv.innerHTML = `<span style="color: #0d6efd; font-weight: 500;">⚡ ${message.texto}</span>`;
-    }
   });
 
+
+
+
+  
+  // ==========================================
+  // 🕵️ 3. AHORA SÍ CREAMOS LA PESTAÑA DEL RUNT
+  // ==========================================
   try {
     placeholder.textContent = "Cargando Angular en la sombra (3-5s)...";
-
     await chrome.tabs.create({
       url: URL_RUNT,
       active: false,
@@ -44,8 +90,55 @@ async function probarScrapingOculto() {
   } catch (error) {
     placeholder.textContent = "❌ Error de entorno";
     errorDiv.style.borderColor = "#dc3545";
-    errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error: ${error.message}</span>`;
+    errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error de entorno: ${error.message}</span>`;
   }
+
+
+
+
+
+  // ==========================================
+  // 🕵️ ESCUCHADOR DEL FORMULARIO (funcion asyncrona)
+  // ==========================================
+  const formulario = document.getElementById("runt-form");
+  formulario.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  // Se extraen los datos del formulario
+  const datosAutomacion = {
+    tipoDoc: document.getElementById("tipoDocumento").value,
+    numDoc: document.getElementById("numeroDocumento").value,
+    placaVehiculo: document.getElementById("placa").value.toUpperCase(),
+    textoCaptcha: document.getElementById("captchaTexto").value,
+  };
+
+  // Damos aviso al usuario a través del div de mensajes
+  errorDiv.style.borderColor = "#0d6efd";
+  errorDiv.innerHTML = `<span style="color: #0d6efd; font-weight: 500;">⚡ Procesando envío seguro...</span>`;
+
+  
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: "inyectarDatosFormularioEntradaRunt",
+      datos: datosAutomacion,
+    });
+
+    // El código se frena aquí hasta que el background responda. 
+    // Una vez responde, el 'if' se ejecuta en línea recta igual que antes:
+    if (response && response.success) {
+      errorDiv.style.borderColor = "#198754";
+      errorDiv.innerHTML = `<span style="color: #198754; font-weight: 600;">✅ ${response.mensaje}</span>`;
+    } else if (response && !response.success) {
+      errorDiv.style.borderColor = "#dc3545";
+      errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error: ${response.error}</span>`;
+    }
+  } catch (error) {
+    // Es vital envolverlo en try/catch porque si el background no está escuchando,
+    // el await lanzará un error que debes atrapar aquí.
+    errorDiv.style.borderColor = "#dc3545";
+    errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error de conexión: ${error.message}</span>`;
+  }
+});
 }
 
 
@@ -53,53 +146,12 @@ async function probarScrapingOculto() {
 
 
 
-
+// ==========================================
+// 🕵️ LISTENER QUE SE ACTIVA APENAS CARGA EL DOM DEL POPUP
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  probarScrapingOculto();
-
-  const formulario = document.getElementById("runt-form");
-
-  formulario.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const datosAutomacion = {
-      tipoDoc: document.getElementById("tipoDocumento").value,
-      numDoc: document.getElementById("numeroDocumento").value,
-      placaVehiculo: document.getElementById("placa").value.toUpperCase(),
-      textoCaptcha: document.getElementById("captchaTexto").value,
-    };
-
-    const errorDiv = document.getElementById("error-section");
-    errorDiv.style.borderColor = "#0d6efd";
-    errorDiv.innerHTML = `<span style="color: #0d6efd; font-weight: 500;">⚡ Procesando envío seguro...</span>`;
-
-    // 🚀 CAMBIO AQUÍ: Le enviamos la orden al Background, que nunca muere
-    // 🚀 Enviamos al background y esperamos su respuesta inmediata
-    chrome.runtime.sendMessage(
-      {
-        action: "guardarDatosFormulario",
-        datos: datosAutomacion,
-      },
-      (response) => {
-        // 🔍 Si el background responde con un error, lo pintamos en la caja roja
-        if (response && !response.success) {
-          errorDiv.style.borderColor = "#dc3545"; // Borde rojo de error
-          errorDiv.innerHTML = `<span style="color: #dc3545; font-weight: 600;">❌ Error: ${response.error}</span>`;
-        }
-        if (response && response.success) {
-          errorDiv.style.borderColor = "#198754"; // Color verde de éxito
-          errorDiv.innerHTML = `<span style="color: #198754; font-weight: 600;">✅ ${response.mensaje}</span>`;
-        }
-      },
-    );
-  });
+  chrome.runtime.connect({ name: "radar-sidepanel" });
+  activarCodigo();
 });
 
-
-
-// Detectar de forma nativa cuándo se destruye/cierra el Side Panel
-window.addEventListener('unload', () => {
-    console.log("se activo el unload")
-    chrome.runtime.sendMessage({ action: "cerrarPestañaRunt" });
-});
 
