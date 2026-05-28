@@ -82,6 +82,26 @@ async function activarCodigo() {
   // 🕵️ 3. AHORA SÍ CREAMOS LA PESTAÑA DEL RUNT
   // ==========================================
   try {
+
+
+    placeholder.textContent = "Limpiando consultas anteriores...";
+
+    // Buscamos TODAS las pestañas abiertas que tengan la URL del RUNT
+    // Usamos el comodín *://*.runt.gov.co/* para atrapar cualquier subdominio o ruta
+    const pestañasRuntExistentes = await chrome.tabs.query({ url: "*://*.runt.gov.co/*" });
+
+    if (pestañasRuntExistentes.length > 0) {
+      console.log(`🧹 Se encontraron ${pestañasRuntExistentes.length} pestañas del RUNT abiertas. Cerrando...`);
+      
+      // Mapeamos los IDs de esas pestañas
+      const idsParaCerrar = pestañasRuntExistentes.map(tab => tab.id);
+      
+      // Las cerramos todas de un solo golpe
+      await chrome.tabs.remove(idsParaCerrar);
+    }
+
+
+
     placeholder.textContent = "Cargando Angular en la sombra (3-5s)...";
     chrome.tabs.create({
       url: URL_RUNT,

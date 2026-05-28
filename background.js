@@ -195,7 +195,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       try {
         // 1. Buscamos directamente la pestaña que coincida con la URL de Tecmmas usando await
-        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+        const tabs = await chrome.tabs.query({ 
+        url: "http://192.168.1.5:8090/et/index.php/oficina/vehiculo/Cvehiculo*" 
+      });
 
         if (tabs.length === 0) {
           console.log("⚠️ No se encontró la pestaña de Tecmmas abierta.");

@@ -232,7 +232,40 @@ function expandirYEsperardesplegableSOAT() {
 
 
 
+// ==========================================
+// 🚨 VIGILAR SI EL RUNT DEVUELVE UN ERROR DE VALIDACIÓN
+// ==========================================
+function verificarErroresRunt(onClean, onError) {
+    // 1. Selector común para las alertas de error que muestra el RUNT (ej: credenciales inválidas, captcha incorrecto)
+    // Nota: Si el RUNT usa un elemento específico como <mat-error> o un div con clase de alerta, ajusta este selector.
+    const selectorErrorRunt = '#swal2-html-container';
+    
+    let tiempoMaximoValidacion;
+    let intervaloError;
 
+    // Seguro de vida: Si en 2.5 segundos no apareció ningún error, asumimos que todo va bien
+    tiempoMaximoValidacion = setTimeout(() => {
+        clearInterval(intervaloError);
+        console.log("⏱️ No se detectaron errores visuales inmediatos. Procediendo a resultados...");
+        onClean(); // Ejecuta la función de éxito (vigilarCargaResultados)
+    }, 2500);
+
+    // Revisamos el DOM cada 200ms buscando textos de error
+    intervaloError = setInterval(() => {
+        const elementoError = document.querySelector(selectorErrorRunt);
+
+        if (elementoError && elementoError.textContent.trim() !== "") {
+            const textoError = elementoError.textContent.trim();
+            console.error(`🚨 Se detectó un error en la plataforma del RUNT: "${textoError}"`);
+            
+            clearInterval(intervaloError);
+            clearTimeout(tiempoMaximoValidacion);
+            
+            // Ejecuta el callback de error notificando al usuario
+            onError(textoError); 
+        }
+    }, 200);
+}
 
 
 
@@ -379,10 +412,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                                 console.log("Se logró dar al botón de login, ahora se activa vigilarCargaResultados");
 
 
-                             
+                             // 🎯 AQUÍ ENTRA LA MAGIA: Interceptamos antes de cantar victoria
+                                verificarErroresRunt(
+                                    // Caso A: Si todo está limpio (onClean)
+                                    () => {
+                                        notificarPopup("⚡ Formulario procesado con éxito. Extrayendo...");
+                                        vigilarCargaResultados();
+                                    },
+                                    // Caso B: Si saltó un error en el RUNT (onError)
+                                    (mensajeErrorRunt) => {
+                                        notificarPopup(`❌ RUNT dice: ${mensajeErrorRunt} Cierre y vuelva a abrir esta extencion.`);
+                                        // Aquí el flujo se detiene por completo. No se llama a vigilarCargaResultados()
+                                    }
+                                );
 
 
-                                vigilarCargaResultados();
+                                
                                 
                             } else {
                                 notificarPopup("⚠️ Formulario lleno, pero falló el selector JS Path del botón.");
