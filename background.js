@@ -1,6 +1,6 @@
 console.log("worker background funcionando...")
 
-
+let esScooter;
 
 
 
@@ -131,6 +131,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // 3. INYECTAR DATOS EN ENTRADA RUNT (Modernizado con Async/Await)
   // =========================================================================
   if (message.action === "inyectarDatosFormularioEntradaRunt") {
+
+    esScooter = message.datos.scooterSeleccionado;
+    
     
     // Creamos una función asíncrona interna para poder usar 'await' de forma limpia
     // patron burbuja para poder utilizar el build in tabs.get que es async
@@ -143,7 +146,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
         return; // Frenamos la ejecución si no hay ID
       }
-
+ 
       try {
         // 🚀 ESPERAMOS a verificar si la pestaña existe y sigue viva
         const tab = await chrome.tabs.get(idPestañaActiva);
@@ -198,6 +201,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           console.log("⚠️ No se encontró la pestaña de Tecmmas abierta.");
           return; // Rompemos la burbuja si no hay pestaña objetivo
         }
+
+
+        // 🎯 ESCABULLIR EL DATO: Fusionamos lo guardado en memoria con el JSON extraído del RUNT
+      // Si por alguna razón viene vacío, le ponemos "NO" por defecto para proteger el script
+      message.datos.esScooter = esScooter || "NO";
+      
+      console.log(`🛵 Agregando propiedad esScooter: "${message.datos.esScooter}" al paquete final.`)
+
 
         // 2. Le disparamos los datos a la primera pestaña encontrada
         await chrome.tabs.sendMessage(tabs[0].id, {

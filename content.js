@@ -28,15 +28,19 @@ function notificarPopup(mensaje) {
 function esperarCaptcha() {
     const selector = "div.col-md-12:nth-child(3) > img:nth-child(1)";
     
-    // Guardamos la referencia del timeout para poder cancelarlo después
-    let timeoutId;
+    let intervalo; // 1. 📦 Declaramos la variable arriba para que sea visible por todos
 
-    const intervalo = setInterval(() => {
+    const timeoutId = setTimeout(() => {
+        clearInterval(intervalo); //  ¡Ahora sí funciona! Ya sabe qué es 'intervalo'
+        console.log("⏱️ Tiempo límite agotado.");
+    }, 15000);
+
+    // 2. Le asignamos el valor real abajo
+    intervalo = setInterval(() => {
         const img = document.querySelector(selector);
-        
         if (img && img.src && img.src.startsWith("data:image")) {
-            clearInterval(intervalo); // Frenamos el bucle
-            clearTimeout(timeoutId);  // 🎯 NUEVO: Cancelamos el temporizador de 15s porque ya ganamos
+            clearInterval(intervalo);
+            clearTimeout(timeoutId);
             
             chrome.runtime.sendMessage({
                 action: "procesarCatcha",
@@ -45,12 +49,6 @@ function esperarCaptcha() {
             });
         }
     }, 500);
-
-    // Asignamos el timeout a la variable
-    timeoutId = setTimeout(() => {
-        clearInterval(intervalo);
-        console.log("⏱️ Tiempo límite de espera de captcha agotado.");
-    }, 15000);
 }
 
 
@@ -160,6 +158,13 @@ function extraerDatosResultado() {
         const elementoSoat = document.querySelector(selectorSoat);
         infoVehiculo.vencimientoSoat = elementoSoat ? elementoSoat.textContent.replace(/.*Vencimiento:\s*/i, "").trim() : "No encontrado";
 
+        // 18. 🏥 VERIFICAR SI ES ENSEÑANZA O NO
+        const selectorEnsenanza = `body > host-runt-root > app-layout > app-theme-runt2 > mat-sidenav-container > mat-sidenav-content > div > ng-component > div > div > div:nth-child(2) > div:nth-child(2) > cyrconsultavehiculo-info-vehiculo-detallada > div > div:nth-child(2) > div > div.panel-content > div.col-lg-12 > div:nth-child(13) > div:nth-child(2) > b`;
+        const elementoEnsenanza = document.querySelector(selectorEnsenanza);
+        infoVehiculo.esEnsenanza = elementoEnsenanza ? elementoEnsenanza.textContent.toUpperCase().trim() : "NO";
+
+
+
         // ==========================================
         // 🚀 ENVÍO DEL PAQUETE TÉCNICO COMPLETO
         // ==========================================
@@ -196,7 +201,14 @@ function expandirYEsperardesplegableSOAT() {
     
     let tiempoMaximoSOAT;
 
-    // 2. Iniciamos el segundo bucle de búsqueda (revisa cada 300ms)
+// Seguro de vida: Si en 8 segundos el RUNT no pintó el SOAT, extrae lo que tenga
+    tiempoMaximoSOAT = setTimeout(() => {
+        clearInterval(intervaloSOAT);
+        console.log("⏱️ Tiempo límite agotado esperando el contenido del SOAT.");
+        extraerDatosResultado(); // Extrae marca, modelo, etc., así falle el SOAT
+    }, 8000);
+
+    //Iniciamos el segundo bucle de búsqueda (revisa cada 300ms)
     const intervaloSOAT = setInterval(() => {
         const elementoSOATPresente = document.querySelector(selectorInternoSOAT);
 
@@ -212,12 +224,7 @@ function expandirYEsperardesplegableSOAT() {
         }
     }, 300);
 
-    // 3. Seguro de vida: Si en 8 segundos el RUNT no pintó el SOAT, extrae lo que tenga
-    tiempoMaximoSOAT = setTimeout(() => {
-        clearInterval(intervaloSOAT);
-        console.log("⏱️ Tiempo límite agotado esperando el contenido del SOAT.");
-        extraerDatosResultado(); // Extrae marca, modelo, etc., así falle el SOAT
-    }, 8000);
+    
 }
 
 
@@ -279,6 +286,9 @@ function vigilarCargaResultados() {
 // 📥 INYECTAR LOS DATOS Y REPORTAR ESTADOS (LISTENERS)
 // ==========================================
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
+
+    //si el mensaje que llega es inyectarDatosRunt, es para rellenar el formulario y entrar
     if (message.action === "inyectarDatosRunt") {
 
         const datos = message.datos;

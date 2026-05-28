@@ -83,7 +83,7 @@ async function activarCodigo() {
   // ==========================================
   try {
     placeholder.textContent = "Cargando Angular en la sombra (3-5s)...";
-    await chrome.tabs.create({
+    chrome.tabs.create({
       url: URL_RUNT,
       active: false,
     });
@@ -110,6 +110,7 @@ async function activarCodigo() {
     numDoc: document.getElementById("numeroDocumento").value,
     placaVehiculo: document.getElementById("placa").value.toUpperCase(),
     textoCaptcha: document.getElementById("captchaTexto").value,
+    scooterSeleccionado: document.querySelector("#esScooter").value
   };
 
   // Damos aviso al usuario a través del div de mensajes
