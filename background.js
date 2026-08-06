@@ -191,6 +191,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "datosVehiculoExtraidos" && message.success) {
     console.log("📬 Recibido en background. Redireccionando a Tecmmas...");
 
+
+    // 🔔 REENVIAR NOTIFICACIÓN AL POPUP (Si está abierto)
+  chrome.runtime.sendMessage({
+    action: "alertaCombustible",
+    se_detecto_otro_combustible: message.se_detecto_otro_combustible
+  }).catch(() => {
+    // Si el popup ya se cerró, ignoramos el error limpiamente
+  });
+
+
+  
     // 🫧 Activamos la burbuja asíncrona interna
     (async () => {
       try {

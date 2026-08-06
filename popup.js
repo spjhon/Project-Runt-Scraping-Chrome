@@ -51,6 +51,18 @@ async function activarCodigo() {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
+    // 🚨 NUEVA ACCIÓN: Manejo de Alerta de Combustible Diferente
+  if (message.action === "alertaCombustible") {
+    const boxAlerta = document.getElementById("alerta-combustible");
+    if (boxAlerta) {
+      if (message.se_detecto_otro_combustible === true) {
+        boxAlerta.style.display = "block"; // Se muestra grande y rojo
+      } else {
+        boxAlerta.style.display = "none";  // Se oculta si no aplica
+      }
+    }
+  }
+
     //Este es para notificaciones que llegan mientras llega el mensaje final
     if (message.action === "notificacionEstado") {
       errorDiv.style.borderColor = "#0d6efd";

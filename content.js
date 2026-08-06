@@ -164,6 +164,13 @@ function extraerDatosResultado() {
         infoVehiculo.esEnsenanza = elementoEnsenanza ? elementoEnsenanza.textContent.toUpperCase().trim() : "NO";
 
 
+        let se_detecto_combustible_diferente = false;
+
+        if (infoVehiculo.combustible !== "gasolina"){
+            infoVehiculo.combustible = "";
+            se_detecto_combustible_diferente = true;
+            
+        }
 
         // ==========================================
         // 🚀 ENVÍO DEL PAQUETE TÉCNICO COMPLETO
@@ -173,7 +180,8 @@ function extraerDatosResultado() {
         chrome.runtime.sendMessage({
             action: "datosVehiculoExtraidos",
             success: true,
-            datos: infoVehiculo
+            datos: infoVehiculo,
+            se_detecto_otro_combustible: se_detecto_combustible_diferente
         });
 
         notificarPopup(`✅ ¡Extracción completa de la placa ${infoVehiculo.placa}!`);
