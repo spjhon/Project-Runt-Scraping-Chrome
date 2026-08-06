@@ -166,7 +166,9 @@ function extraerDatosResultado() {
 
         let se_detecto_combustible_diferente = false;
 
-        if (infoVehiculo.combustible !== "gasolina"){
+      
+
+        if (infoVehiculo.combustible !== "GASOLINA"){
             infoVehiculo.combustible = "";
             se_detecto_combustible_diferente = true;
             
