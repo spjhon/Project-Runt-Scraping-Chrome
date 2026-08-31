@@ -95,7 +95,7 @@ async function activarCodigo() {
   // ==========================================
   try {
 
-
+/** 
     placeholder.textContent = "Limpiando consultas anteriores...";
 
     // Buscamos TODAS las pestañas abiertas que tengan la URL del RUNT
@@ -111,7 +111,7 @@ async function activarCodigo() {
       // Las cerramos todas de un solo golpe
       await chrome.tabs.remove(idsParaCerrar);
     }
-
+*/
 
 
     placeholder.textContent = "Cargando Angular en la sombra (3-5s)...";

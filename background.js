@@ -22,6 +22,7 @@ chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "radar-sidepanel") {
     console.log("📱 Side Panel conectado al radar del Background.");
 
+/** 
     // Cuando el panel se cierra, este evento se dispara SÍ O SÍ por el navegador
     port.onDisconnect.addListener(() => {
       console.log("🚨 El Side Panel se ha cerrado. Liquidando pestaña del RUNT...");
@@ -31,6 +32,10 @@ chrome.runtime.onConnect.addListener((port) => {
         idPestañaActiva = null;
       }
     });
+*/
+
+
+
   }
 });
 
